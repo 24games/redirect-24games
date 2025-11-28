@@ -60,17 +60,18 @@ const RedirectPage = () => {
               }}
               initial={{
                 scale: 1,
-                opacity: 0.8,
+                opacity: 0,
               }}
               animate={{
-                scale: [1, 1.5, 1.8],
-                opacity: [0.8, 0.4, 0],
+                scale: [1, 1.3, 1.6, 1.8],
+                opacity: [0, 0.8, 0.5, 0],
               }}
               transition={{
-                duration: 2,
+                duration: 2.5,
                 repeat: Infinity,
-                delay: index * 0.7,
-                ease: 'easeOut',
+                delay: index * 0.8,
+                ease: [0.4, 0, 0.2, 1],
+                repeatType: 'loop',
               }}
             />
           ))}
