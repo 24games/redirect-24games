@@ -1,292 +1,244 @@
 import { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Shield } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 const DESTINATION_URL = "https://24games.cl/register?token=seioeqvovmirpgcrktkbmpkkli&affiliateId=503785&"
 
 const RedirectPage = () => {
-  const [progress, setProgress] = useState(0)
+  const [dots, setDots] = useState('')
+  const [obstacles, setObstacles] = useState([])
+  const [shouldJump, setShouldJump] = useState(false)
 
   useEffect(() => {
-    // Animação da barra de progresso (4 segundos)
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(progressInterval)
-          return 100
-        }
-        return prev + 1.25 // ~100% em 4 segundos (80 frames)
+    // Animação das reticências
+    const dotsInterval = setInterval(() => {
+      setDots((prev) => {
+        if (prev === '...') return ''
+        return prev + '.'
       })
-    }, 50)
+    }, 500)
 
-    // Redirecionamento após 4 segundos
+    // Criar obstáculos periodicamente
+    const obstaclesInterval = setInterval(() => {
+      setObstacles((prev) => {
+        const newObstacle = {
+          id: Date.now() + Math.random(),
+          createdAt: Date.now(),
+        }
+        return [...prev, newObstacle].slice(-5) // Manter máximo de 5 obstáculos
+      })
+    }, 2500)
+
+    // Verificar se personagem deve pular (quando obstáculo está próximo)
+    const jumpCheckInterval = setInterval(() => {
+      const now = Date.now()
+      const shouldTriggerJump = obstacles.some(obs => {
+        const elapsed = now - obs.createdAt
+        // Obstáculo está na posição certa após ~1.5s (meio do caminho)
+        return elapsed > 1400 && elapsed < 1800
+      })
+      
+      if (shouldTriggerJump && !shouldJump) {
+        setShouldJump(true)
+        setTimeout(() => setShouldJump(false), 500)
+      }
+    }, 100)
+
+    // Redirecionamento após 5 segundos
     const redirectTimer = setTimeout(() => {
       window.location.href = DESTINATION_URL
-    }, 4000)
+    }, 5000)
 
     return () => {
-      clearInterval(progressInterval)
+      clearInterval(dotsInterval)
+      clearInterval(obstaclesInterval)
+      clearInterval(jumpCheckInterval)
       clearTimeout(redirectTimer)
     }
-  }, [])
+  }, [obstacles.length])
 
   return (
-    <div className="min-h-screen w-full bg-slate-950 flex flex-col items-center justify-center relative overflow-hidden">
-      {/* Background Gradient Radial */}
-      <div className="absolute inset-0 bg-gradient-radial from-green-950/20 via-slate-950 to-slate-950 pointer-events-none" />
-      
-      {/* Logo com Glow */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="relative mb-8 md:mb-12 z-10"
-      >
-        <div className="relative">
-          {/* Glow effect */}
-          <div className="absolute inset-0 blur-2xl bg-neon-green/30 rounded-full scale-150" />
-          {/* Logo */}
-          <img
-            src="/images/logo.png"
-            alt="24Games Logo"
-            className="relative w-20 h-20 md:w-28 md:h-28 object-contain"
-            onError={(e) => {
-              // Fallback caso a imagem não seja encontrada
-              e.target.src = "https://via.placeholder.com/120x120/00FF88/0a0a0a?text=24G"
-            }}
-          />
-        </div>
-      </motion.div>
+    <div className="min-h-screen w-full bg-[#0a0a0a] flex flex-col relative overflow-hidden">
+      {/* Background Grid Pixelado */}
+      <div 
+        className="absolute inset-0 opacity-20"
+        style={{
+          backgroundImage: `
+            linear-gradient(#00FF00 1px, transparent 1px),
+            linear-gradient(90deg, #00FF00 1px, transparent 1px)
+          `,
+          backgroundSize: '20px 20px',
+          imageRendering: 'pixelated',
+        }}
+      />
 
-      {/* Roleta Supercharged com Sparks */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="mb-8 md:mb-12 z-10 relative"
-      >
-        <CasinoWheel />
-        <Sparks />
-      </motion.div>
+      {/* Conteúdo Principal */}
+      <div className="flex-1 flex flex-col items-center justify-center relative z-10 px-4">
+        {/* Ícone Slot Machine + Texto */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-col items-center gap-6 mb-16"
+        >
+          {/* Ícone Slot Machine Pixelado */}
+          <motion.svg
+            width="80"
+            height="80"
+            viewBox="0 0 80 80"
+            className="mb-4"
+            animate={{ y: [0, -5, 0] }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            {/* Corpo da máquina */}
+            <rect x="10" y="20" width="60" height="50" fill="#00FF00" stroke="#0a0a0a" strokeWidth="2" />
+            <rect x="15" y="25" width="50" height="40" fill="#0a0a0a" />
+            
+            {/* Rolos */}
+            <rect x="20" y="30" width="12" height="30" fill="#00FF00" stroke="#0a0a0a" strokeWidth="1" />
+            <rect x="34" y="30" width="12" height="30" fill="#00FF00" stroke="#0a0a0a" strokeWidth="1" />
+            <rect x="48" y="30" width="12" height="30" fill="#00FF00" stroke="#0a0a0a" strokeWidth="1" />
+            
+            {/* Símbolos nos rolos */}
+            <circle cx="26" cy="40" r="3" fill="#0a0a0a" />
+            <circle cx="40" cy="40" r="3" fill="#0a0a0a" />
+            <circle cx="54" cy="40" r="3" fill="#0a0a0a" />
+            
+            {/* Alavanca */}
+            <rect x="70" y="35" width="8" height="20" fill="#8B5CF6" stroke="#0a0a0a" strokeWidth="1" />
+            <circle cx="74" cy="30" r="4" fill="#8B5CF6" stroke="#0a0a0a" strokeWidth="1" />
+          </motion.svg>
 
-      {/* Card Glassmorphism */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-        className="w-full max-w-md mx-4 z-10"
-      >
-        <div className="bg-black/40 backdrop-blur-md border border-gray-800/50 rounded-2xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
-          {/* Brilho sutil no card */}
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-neon-green/50 to-transparent" />
-          
-          <div className="space-y-4">
-            {/* Título */}
-            <h1 className="text-white text-xl md:text-2xl font-semibold text-center">
-              Conectando al servidor...
+          {/* Texto com Reticências Animadas */}
+          <div className="flex items-center gap-2">
+            <h1 
+              className="text-white text-lg md:text-xl lg:text-2xl font-pixel"
+              style={{ 
+                fontFamily: "'Press Start 2P', monospace",
+                textShadow: '0 0 10px #00FF00, 0 0 20px #00FF00',
+                lineHeight: '1.8',
+              }}
+            >
+              Espera para liberar tus giros gratis
             </h1>
-            
-            {/* Subtítulo */}
-            <p className="text-gray-400 text-sm md:text-base text-center">
-              Estás siendo redirigido al entorno seguro.
-            </p>
-            
-            {/* Barra de Progresso */}
-            <div className="pt-4">
-              <div className="w-full h-1 bg-gray-800/50 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-gradient-to-r from-neon-green to-green-400 rounded-full"
-                  initial={{ width: '0%' }}
-                  animate={{ width: `${progress}%` }}
-                  transition={{ duration: 0.1, ease: 'linear' }}
-                />
-              </div>
+            <div className="flex gap-1">
+              {[0, 1, 2].map((index) => (
+                <motion.span
+                  key={index}
+                  className="text-white text-lg md:text-xl lg:text-2xl"
+                  style={{ fontFamily: "'Press Start 2P', monospace" }}
+                  animate={{
+                    y: index === dots.length - 1 ? [-4, 0] : 0,
+                  }}
+                  transition={{
+                    duration: 0.3,
+                    repeat: Infinity,
+                    delay: index * 0.2,
+                    ease: 'easeOut',
+                  }}
+                >
+                  {index < dots.length ? '.' : ''}
+                </motion.span>
+              ))}
             </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
 
-      {/* Footer */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.5 }}
-        className="mt-8 md:mt-12 z-10"
-      >
-        <div className="flex items-center gap-2 text-gray-500 text-xs md:text-sm">
-          <Shield className="w-4 h-4" />
-          <span>Conexión Segura 24Games</span>
-        </div>
-      </motion.div>
-    </div>
-  )
-}
-
-// Componente Roleta de Cassino
-const CasinoWheel = () => {
-  const segments = 16 // Número de segmentos na roleta
-  const radius = 50
-  const centerX = 50
-  const centerY = 50
-
-  // Criar segmentos alternados (verde e preto)
-  const createSegments = () => {
-    const angleStep = 360 / segments
-    const segmentsArray = []
-
-    for (let i = 0; i < segments; i++) {
-      const startAngle = (i * angleStep - 90) * (Math.PI / 180)
-      const endAngle = ((i + 1) * angleStep - 90) * (Math.PI / 180)
-      
-      const x1 = centerX + radius * Math.cos(startAngle)
-      const y1 = centerY + radius * Math.sin(startAngle)
-      const x2 = centerX + radius * Math.cos(endAngle)
-      const y2 = centerY + radius * Math.sin(endAngle)
-
-      const isGreen = i % 2 === 0
-      
-      segmentsArray.push(
-        <path
-          key={i}
-          d={`M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 0 1 ${x2} ${y2} Z`}
-          fill={isGreen ? '#00FF88' : '#0a0a0a'}
-          stroke={isGreen ? '#00FF88' : '#1a1a1a'}
-          strokeWidth="0.5"
-        />
-      )
-    }
-    return segmentsArray
-  }
-
-  return (
-    <div className="relative w-32 h-32 md:w-40 md:h-40">
-      {/* Roleta com Motion Blur (atrás) - Camada 1 */}
-      <motion.svg
-        className="absolute inset-0 blur-md opacity-40"
-        viewBox="0 0 100 100"
-        initial={{ rotate: 0 }}
-        animate={{ rotate: 360 }}
-        transition={{
-          duration: 0.25,
-          repeat: Infinity,
-          ease: 'linear',
-        }}
-      >
-        {createSegments()}
-        <circle cx={centerX} cy={centerY} r="8" fill="#0a0a0a" stroke="#00FF88" strokeWidth="1" />
-      </motion.svg>
-
-      {/* Roleta com Motion Blur (atrás) - Camada 2 */}
-      <motion.svg
-        className="absolute inset-0 blur-sm opacity-60"
-        viewBox="0 0 100 100"
-        initial={{ rotate: 0 }}
-        animate={{ rotate: -360 }}
-        transition={{
-          duration: 0.28,
-          repeat: Infinity,
-          ease: 'linear',
-        }}
-      >
-        {createSegments()}
-        <circle cx={centerX} cy={centerY} r="8" fill="#0a0a0a" stroke="#00FF88" strokeWidth="1" />
-      </motion.svg>
-
-      {/* Roleta Principal */}
-      <motion.svg
-        className="absolute inset-0 relative z-10"
-        viewBox="0 0 100 100"
-        initial={{ rotate: 0 }}
-        animate={{ rotate: 360 }}
-        transition={{
-          duration: 0.25,
-          repeat: Infinity,
-          ease: 'linear',
-        }}
-      >
-        {createSegments()}
-        {/* Círculo central com brilho */}
-        <circle cx={centerX} cy={centerY} r="8" fill="#0a0a0a" stroke="#00FF88" strokeWidth="1.5" />
-        <circle cx={centerX} cy={centerY} r="3" fill="#00FF88" opacity="0.9" />
-        {/* Glow no centro */}
-        <circle cx={centerX} cy={centerY} r="5" fill="#00FF88" opacity="0.3" />
-      </motion.svg>
-    </div>
-  )
-}
-
-// Componente de Partículas (Sparks)
-const Sparks = () => {
-  const [sparks, setSparks] = useState([])
-
-  useEffect(() => {
-    // Criar novas faíscas continuamente
-    const createSpark = () => {
-      const angle = Math.random() * Math.PI * 2
-      const distance = 40 + Math.random() * 60 // Distância da borda da roleta
-      const x = Math.cos(angle) * distance
-      const y = Math.sin(angle) * distance
-      
-      const randomX = (Math.random() - 0.5) * 200
-      const randomY = (Math.random() - 0.5) * 200
-      
-      const id = Date.now() + Math.random()
-      
-      return {
-        id,
-        x,
-        y,
-        targetX: randomX,
-        targetY: randomY,
-        delay: Math.random() * 0.3,
-      }
-    }
-
-    // Gerar faíscas periodicamente
-    const interval = setInterval(() => {
-      const newSparks = Array.from({ length: 3 }, () => createSpark())
-      setSparks((prev) => [...prev, ...newSparks].slice(-20)) // Manter máximo de 20
-    }, 150)
-
-    return () => clearInterval(interval)
-  }, [])
-
-  return (
-    <div className="absolute inset-0 pointer-events-none">
-      <AnimatePresence>
-        {sparks.map((spark) => (
-          <motion.div
-            key={spark.id}
-            className="absolute top-1/2 left-1/2 w-2 h-2 bg-neon-green rounded-full"
+      {/* Cena de Jogo 2D (Rodapé - 30% inferior) */}
+      <div className="h-[30vh] relative overflow-hidden border-t-2 border-[#00FF00]">
+        {/* Chão que se move */}
+        <motion.div
+          className="absolute bottom-0 left-0 w-full h-4 bg-[#00FF00]"
+          style={{
+            boxShadow: '0 -2px 10px #00FF00',
+          }}
+          animate={{
+            x: ['0%', '-100%'],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: 'linear',
+          }}
+        >
+          {/* Padrão de chão pixelado */}
+          <div 
+            className="w-[200%] h-full"
             style={{
-              boxShadow: '0 0 6px #00FF88, 0 0 12px #00FF88',
-            }}
-            initial={{
-              x: spark.x,
-              y: spark.y,
-              opacity: 1,
-              scale: 1,
-            }}
-            animate={{
-              x: spark.targetX,
-              y: spark.targetY,
-              opacity: 0,
-              scale: 0,
-            }}
-            transition={{
-              duration: 0.6 + Math.random() * 0.2,
-              delay: spark.delay,
-              ease: 'easeOut',
-            }}
-            onAnimationComplete={() => {
-              setSparks((prev) => prev.filter((s) => s.id !== spark.id))
+              backgroundImage: 'repeating-linear-gradient(90deg, #00FF00 0px, #00FF00 20px, #0a0a0a 20px, #0a0a0a 40px)',
             }}
           />
+        </motion.div>
+
+        {/* Personagem Pixelado */}
+        <motion.div
+          className="absolute bottom-4 left-[10%] z-20"
+          animate={{
+            y: [0, -2, 0],
+          }}
+          transition={{
+            duration: 0.3,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        >
+          {/* Animação de pulo quando obstáculo se aproxima */}
+          <motion.div
+            animate={{
+              y: shouldJump ? [-30, 0] : 0,
+            }}
+            transition={{
+              duration: 0.4,
+              ease: 'easeOut',
+            }}
+            className="relative"
+          >
+            {/* Cabeça */}
+            <div className="w-6 h-6 bg-white border-2 border-[#0a0a0a] mb-0.5" />
+            {/* Corpo */}
+            <div className="w-6 h-8 bg-[#00FF00] border-2 border-[#0a0a0a] relative">
+              {/* Olhos */}
+              <div className="absolute top-1 left-1 w-1 h-1 bg-[#0a0a0a]" />
+              <div className="absolute top-1 right-1 w-1 h-1 bg-[#0a0a0a]" />
+            </div>
+            {/* Pernas */}
+            <div className="flex gap-1">
+              <div className="w-2 h-4 bg-white border border-[#0a0a0a]" />
+              <div className="w-2 h-4 bg-white border border-[#0a0a0a]" />
+            </div>
+          </motion.div>
+        </motion.div>
+
+        {/* Obstáculos */}
+        {obstacles.map((obstacle) => (
+          <motion.div
+            key={obstacle.id}
+            className="absolute bottom-4 right-0 z-10"
+            initial={{ x: '100%' }}
+            animate={{ x: '-20%' }}
+            transition={{
+              duration: 3,
+              ease: 'linear',
+              repeat: 0,
+            }}
+            onAnimationComplete={() => {
+              setObstacles((prev) => prev.filter((obs) => obs.id !== obstacle.id))
+            }}
+          >
+            {/* Espinho/Obstáculo Pixelado */}
+            <div className="relative">
+              {/* Base */}
+              <div className="w-4 h-4 bg-[#8B5CF6] border-2 border-[#0a0a0a]" />
+              {/* Pico superior */}
+              <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-r-[4px] border-b-[6px] border-l-transparent border-r-transparent border-b-[#8B5CF6]" />
+              {/* Brilho */}
+              <div className="absolute top-0.5 left-0.5 w-1 h-1 bg-white opacity-80" />
+            </div>
+          </motion.div>
         ))}
-      </AnimatePresence>
+      </div>
     </div>
   )
 }
 
 export default RedirectPage
-

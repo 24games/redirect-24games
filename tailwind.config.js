@@ -12,6 +12,7 @@ export default {
       },
       fontFamily: {
         'sans': ['Inter', 'Sora', 'system-ui', 'sans-serif'],
+        'pixel': ['Press Start 2P', 'VT323', 'monospace'],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
