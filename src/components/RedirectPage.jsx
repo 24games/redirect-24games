@@ -31,7 +31,7 @@ const RedirectPage = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mb-16 md:mb-20"
+          className="mb-12 md:mb-16"
         >
           <img
             src="/images/logo.png"
@@ -43,8 +43,51 @@ const RedirectPage = () => {
           />
         </motion.div>
 
+        {/* Imagem do Tigre com Animação de Pulsação */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="relative mb-12 md:mb-16"
+        >
+          {/* Animação de Pulsação Verde Atrás */}
+          <motion.div
+            className="absolute inset-0 rounded-full"
+            style={{
+              background: 'radial-gradient(circle, rgba(0, 255, 136, 0.3) 0%, transparent 70%)',
+            }}
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.5, 0.8, 0.5],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          />
+
+          {/* Imagem com Borda Arredondada e Traçado Verde */}
+          <div className="relative rounded-full p-1" style={{
+            background: 'linear-gradient(135deg, #00FF88, #00FF88)',
+            boxShadow: '0 0 20px rgba(0, 255, 136, 0.6), 0 0 40px rgba(0, 255, 136, 0.4)',
+          }}>
+            <img
+              src="/images/tigre.jpeg"
+              alt="Ícone Tigre"
+              className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-2 border-[#00FF88]"
+              style={{
+                boxShadow: 'inset 0 0 20px rgba(0, 255, 136, 0.3)',
+              }}
+              onError={(e) => {
+                e.target.src = "https://via.placeholder.com/160x160/00FF88/0a0a0a?text=🐯"
+              }}
+            />
+          </div>
+        </motion.div>
+
         {/* Espaço */}
-        <div className="h-8 md:h-12" />
+        <div className="h-4 md:h-6" />
 
         {/* Headline com Gradiente */}
         <motion.div
