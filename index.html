@@ -11,6 +11,9 @@
     <!-- Redirect Script -->
     <script>
       (function() {
+        // Captura o pathname logo no início, antes do React Router
+        var initialPathname = window.location.pathname;
+        
         // Landing pages conhecidas
         var landingPages = {
           'supercuota': {
@@ -21,13 +24,14 @@
         
         // Função para detectar landing page e slug
         function getLandingPageAndSlug() {
-          var pathname = window.location.pathname;
-          var segments = pathname.replace(/^\//, '').split('/').filter(function(s) { return s; });
+          // Usa o pathname inicial capturado
+          var pathname = initialPathname || window.location.pathname;
+          var segments = pathname.replace(/^\//, '').split('/').filter(function(s) { return s && s.length > 0; });
           
           var landingPage = null;
           var slug = 'cr1'; // padrão
           
-          if (segments.length === 2) {
+          if (segments.length >= 2) {
             // Ex: /supercuota/cr1
             landingPage = segments[0];
             slug = segments[1];
@@ -60,21 +64,43 @@
           return baseUrl;
         }
         
-        window.addEventListener('load', function() {
-          setTimeout(function() {
+        // Função de redirect que pode ser chamada de múltiplas formas
+        function performRedirect() {
+          try {
             var params = window.location.search;
             var base_url = getRedirectUrl();
             var separator = base_url.includes('?') ? '&' : '?';
             var redirect_link_with_params = params ? base_url + separator + params.substring(1) : base_url;
-            window.location.href = redirect_link_with_params;
-          }, 2000);
-        });
+            
+            if (redirect_link_with_params) {
+              window.location.href = redirect_link_with_params;
+            }
+          } catch (e) {
+            console.error('Redirect error:', e);
+          }
+        }
+        
+        // Executa quando a página carrega
+        if (document.readyState === 'loading') {
+          window.addEventListener('load', function() {
+            setTimeout(performRedirect, 2000);
+          });
+        } else {
+          // Se já carregou, executa direto
+          setTimeout(performRedirect, 2000);
+        }
+        
+        // Backup: executa após um tempo maior caso o anterior não funcione
+        setTimeout(performRedirect, 5000);
       })();
     </script>
 
     <!-- Backredirect -->
     <script>
       (function() {
+        // Captura o pathname logo no início
+        var initialPathname = window.location.pathname;
+        
         // Landing pages conhecidas
         var landingPages = {
           'supercuota': {
@@ -85,13 +111,13 @@
         
         // Função para detectar landing page e slug
         function getLandingPageAndSlug() {
-          var pathname = window.location.pathname;
-          var segments = pathname.replace(/^\//, '').split('/').filter(function(s) { return s; });
+          var pathname = initialPathname || window.location.pathname;
+          var segments = pathname.replace(/^\//, '').split('/').filter(function(s) { return s && s.length > 0; });
           
           var landingPage = null;
           var slug = 'cr1'; // padrão
           
-          if (segments.length === 2) {
+          if (segments.length >= 2) {
             landingPage = segments[0];
             slug = segments[1];
           } else if (segments.length === 1) {
