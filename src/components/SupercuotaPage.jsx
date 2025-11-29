@@ -7,6 +7,7 @@ const SupercuotaPage = () => {
       highlightedText="supercuota"
       imagePath="/images/supercuota.png"
       imageAlt="Supercuota"
+      simpleImage={true}
     />
   )
 }

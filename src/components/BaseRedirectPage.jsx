@@ -4,7 +4,8 @@ const BaseRedirectPage = ({
   title, 
   highlightedText, 
   imagePath = "/images/imagem-central.png",
-  imageAlt = "Imagem Central"
+  imageAlt = "Imagem Central",
+  simpleImage = false // Para imagens PNG sem fundo (sem efeitos visuais)
 }) => {
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden">
@@ -34,57 +35,89 @@ const BaseRedirectPage = ({
           />
         </motion.div>
 
-        {/* Imagem Central com Animação de Traçado Verde */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="relative mb-12 md:mb-16"
-        >
-          {/* Animação de Traçado Verde que se Expande e Some com Fade */}
-          {[0, 1, 2].map((index) => (
-            <motion.div
-              key={index}
-              className="absolute inset-0 rounded-2xl border-2 border-[#00FF88]"
-              style={{
-                boxShadow: '0 0 20px rgba(0, 255, 136, 0.6)',
-              }}
-              initial={{
-                scale: 1,
-                opacity: 0,
-              }}
-              animate={{
-                scale: [1, 1.3, 1.6, 1.8],
-                opacity: [0, 0.8, 0.5, 0],
-              }}
-              transition={{
-                duration: 2.5,
+        {/* Imagem Central */}
+        {simpleImage ? (
+          /* Imagem Simples com Apenas Pulsação (para PNG sem fundo) */
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ 
+              opacity: 1, 
+              scale: 1,
+              y: [0, -5, 0]
+            }}
+            transition={{ 
+              duration: 0.6, 
+              delay: 0.1,
+              y: {
+                duration: 1,
                 repeat: Infinity,
-                delay: index * 0.8,
-                ease: [0.4, 0, 0.2, 1],
-                repeatType: 'loop',
-              }}
-            />
-          ))}
-
-          {/* Imagem com Borda Arredondada e Traçado Verde */}
-          <div className="relative rounded-2xl p-1" style={{
-            background: 'linear-gradient(135deg, #00FF88, #00FF88)',
-            boxShadow: '0 0 20px rgba(0, 255, 136, 0.6), 0 0 40px rgba(0, 255, 136, 0.4)',
-          }}>
+                ease: 'easeInOut'
+              }
+            }}
+            className="relative mb-12 md:mb-16"
+          >
             <img
               src={imagePath}
               alt={imageAlt}
-              className="w-32 h-32 md:w-40 md:h-40 rounded-2xl object-cover border-2 border-[#00FF88]"
-              style={{
-                boxShadow: 'inset 0 0 20px rgba(0, 255, 136, 0.3)',
-              }}
+              className="w-32 h-32 md:w-40 md:h-40 object-contain"
               onError={(e) => {
                 e.target.src = "https://via.placeholder.com/160x160/00FF88/0a0a0a?text=IMG"
               }}
             />
-          </div>
-        </motion.div>
+          </motion.div>
+        ) : (
+          /* Imagem com Efeitos Visuais (bordas, traçados, etc) */
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="relative mb-12 md:mb-16"
+          >
+            {/* Animação de Traçado Verde que se Expande e Some com Fade */}
+            {[0, 1, 2].map((index) => (
+              <motion.div
+                key={index}
+                className="absolute inset-0 rounded-2xl border-2 border-[#00FF88]"
+                style={{
+                  boxShadow: '0 0 20px rgba(0, 255, 136, 0.6)',
+                }}
+                initial={{
+                  scale: 1,
+                  opacity: 0,
+                }}
+                animate={{
+                  scale: [1, 1.3, 1.6, 1.8],
+                  opacity: [0, 0.8, 0.5, 0],
+                }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  delay: index * 0.8,
+                  ease: [0.4, 0, 0.2, 1],
+                  repeatType: 'loop',
+                }}
+              />
+            ))}
+
+            {/* Imagem com Borda Arredondada e Traçado Verde */}
+            <div className="relative rounded-2xl p-1" style={{
+              background: 'linear-gradient(135deg, #00FF88, #00FF88)',
+              boxShadow: '0 0 20px rgba(0, 255, 136, 0.6), 0 0 40px rgba(0, 255, 136, 0.4)',
+            }}>
+              <img
+                src={imagePath}
+                alt={imageAlt}
+                className="w-32 h-32 md:w-40 md:h-40 rounded-2xl object-cover border-2 border-[#00FF88]"
+                style={{
+                  boxShadow: 'inset 0 0 20px rgba(0, 255, 136, 0.3)',
+                }}
+                onError={(e) => {
+                  e.target.src = "https://via.placeholder.com/160x160/00FF88/0a0a0a?text=IMG"
+                }}
+              />
+            </div>
+          </motion.div>
+        )}
 
         {/* Espaço */}
         <div className="h-4 md:h-6" />
