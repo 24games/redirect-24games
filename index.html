@@ -10,28 +10,62 @@
 
     <!-- Redirect Script -->
     <script>
-      window.addEventListener('load', function() {
-        setTimeout(function() {
-          var params = window.location.search;
-          var base_url = "https://go.aff.24gamespartners.com/ep66d86x?utm_campaign=Cr1_Leva1";
-          var separator = base_url.includes('?') ? '&' : '?';
-          var redirect_link_with_params = base_url + separator + params.substring(1);
-          window.location.href = redirect_link_with_params;
-        }, 2000);
-      });
+      (function() {
+        // Função para detectar a slug do pathname
+        function getSlugFromPath() {
+          var pathname = window.location.pathname;
+          // Remove a barra inicial e pega a slug (ex: /cr1 -> cr1)
+          var slug = pathname.replace(/^\//, '').split('/')[0];
+          // Se não tiver slug, usa um valor padrão
+          return slug || 'cr1';
+        }
+        
+        // Função para gerar o URL de redirecionamento
+        function getRedirectUrl() {
+          var slug = getSlugFromPath();
+          var baseUrl = "https://go.aff.24gamespartners.com/3w15f015?utm_campaign=casino_" + slug;
+          return baseUrl;
+        }
+        
+        window.addEventListener('load', function() {
+          setTimeout(function() {
+            var params = window.location.search;
+            var base_url = getRedirectUrl();
+            var separator = base_url.includes('?') ? '&' : '?';
+            var redirect_link_with_params = params ? base_url + separator + params.substring(1) : base_url;
+            window.location.href = redirect_link_with_params;
+          }, 2000);
+        });
+      })();
     </script>
 
     <!-- Backredirect -->
     <script>
-      var params = window.location.search;
-      var back_redirect_back_link = "https://go.aff.24gamespartners.com/ep66d86x?utm_campaign=Cr1_Leva1" + params;
-      history.pushState({}, "", location.href);
-      history.pushState({}, "", location.href);
-      window.onpopstate = function () {
-        setTimeout(function () {
-          location.href = back_redirect_back_link;
-        }, 1);
-      };
+      (function() {
+        // Função para detectar a slug do pathname
+        function getSlugFromPath() {
+          var pathname = window.location.pathname;
+          var slug = pathname.replace(/^\//, '').split('/')[0];
+          return slug || 'cr1';
+        }
+        
+        // Função para gerar o URL de redirecionamento
+        function getRedirectUrl() {
+          var slug = getSlugFromPath();
+          var baseUrl = "https://go.aff.24gamespartners.com/3w15f015?utm_campaign=casino_" + slug;
+          return baseUrl;
+        }
+        
+        var params = window.location.search;
+        var back_redirect_back_link = getRedirectUrl() + params;
+        history.pushState({}, "", location.href);
+        history.pushState({}, "", location.href);
+        window.onpopstate = function () {
+          setTimeout(function () {
+            location.href = back_redirect_back_link;
+          }, 1);
+        };
+      })();
     </script>
     <!-- Backredirect -->
 
